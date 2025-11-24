@@ -14,6 +14,7 @@
     let auth0 = null;
 
     async function configureClient() {
+      console.log('Configuring Auth0 client...');
       auth0 = await createAuth0Client({
         domain: 'dev-zukti-tech.uk.auth0.com',
         client_id: 'IfpGUsKwXt67G9qDiIUk79h73CnVGeNy',
@@ -22,32 +23,58 @@
           scope: 'openid profile email' // Explicitly include the scope parameter
         }
       });
+      console.log('Auth0 client configured.');
     }
 
     async function login() {
-      await auth0.loginWithRedirect();
+      console.log('Login button clicked');
+      try {
+        await auth0.loginWithRedirect();
+        console.log('Redirecting to Auth0 login page...');
+      } catch (err) {
+        console.error('Login error:', err);
+      }
     }
 
     async function logout() {
-      auth0.logout({ logoutParams: { returnTo: window.location.origin } });
+      console.log('Logout button clicked');
+      try {
+        auth0.logout({ logoutParams: { returnTo: window.location.origin } });
+        console.log('Logged out successfully.');
+      } catch (err) {
+        console.error('Logout error:', err);
+      }
     }
 
     async function handleAuth() {
+      console.log('Handling authentication...');
       await configureClient();
 
       if (window.location.search.includes('code=') && window.location.search.includes('state=')) {
-        await auth0.handleRedirectCallback();
+        console.log('Handling redirect callback...');
+        try {
+          await auth0.handleRedirectCallback();
+          console.log('Redirect callback handled successfully.');
+        } catch (err) {
+          console.error('Error handling redirect callback:', err);
+        }
         window.history.replaceState({}, document.title, '/');
       }
 
       const isAuthenticated = await auth0.isAuthenticated();
+      console.log('Is authenticated:', isAuthenticated);
 
       document.getElementById('login').style.display = isAuthenticated ? 'none' : 'inline-block';
       document.getElementById('logout').style.display = isAuthenticated ? 'inline-block' : 'none';
 
       if (isAuthenticated) {
-        const user = await auth0.getUser();
-        document.getElementById('profile').innerText = 'Logged in as: ' + user.name;
+        try {
+          const user = await auth0.getUser();
+          console.log('User:', user);
+          document.getElementById('profile').innerText = 'Logged in as: ' + user.name;
+        } catch (err) {
+          console.error('Error fetching user profile:', err);
+        }
       } else {
         document.getElementById('profile').innerText = '';
       }
