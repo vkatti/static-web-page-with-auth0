@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Auth0 Example on GitHub Pages</title>
+  <script src="https://cdn.auth0.com/js/auth0-spa-js/1.13/auth0-spa-js.production.js"></script>
+</head>
+<body>
+  <h1>Auth0 Authentication Example</h1>
+  <button id="login">Login</button>
+  <button id="logout" style="display:none;">Logout</button>
+  <div id="profile"></div>
+  <script>
+    let auth0 = null;
+
+    async function configureClient() {
+      auth0 = await createAuth0Client({
+        domain: 'dev-zukti-tech.uk.auth0.com',
+        client_id: 'IfpGUsKwXt67G9qDiIUk79h73CnVGeNy',
+        authorizationParams: {
+          redirect_uri: window.location.origin
+        }
+      });
+    }
+
+    async function login() {
+      await auth0.loginWithRedirect();
+    }
+
+    async function logout() {
+      auth0.logout({ logoutParams: { returnTo: window.location.origin } });
+    }
+
+    async function handleAuth() {
+      await configureClient();
+
+      if (window.location.search.includes('code=') && window.location.search.includes('state=')) {
+        await auth0.handleRedirectCallback();
+        window.history.replaceState({}, document.title, '/');
+      }
+
+      const isAuthenticated = await auth0.isAuthenticated();
+
+      document.getElementById('login').style.display = isAuthenticated ? 'none' : 'inline-block';
+      document.getElementById('logout').style.display = isAuthenticated ? 'inline-block' : 'none';
+
+      if (isAuthenticated) {
+        const user = await auth0.getUser();
+        document.getElementById('profile').innerText = 'Logged in as: ' + user.name;
+      } else {
+        document.getElementById('profile').innerText = '';
+      }
+    }
+
+    window.onload = handleAuth;
+    document.getElementById('login').addEventListener('click', login);
+    document.getElementById('logout').addEventListener('click', logout);
+  </script>
+</body>
+</html>
