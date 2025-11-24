@@ -18,7 +18,8 @@
         domain: 'dev-zukti-tech.uk.auth0.com',
         client_id: 'IfpGUsKwXt67G9qDiIUk79h73CnVGeNy',
         authorizationParams: {
-          redirect_uri: window.location.origin
+          redirect_uri: window.location.origin,
+          scope: 'openid profile email' // Explicitly include the scope parameter
         }
       });
     }
