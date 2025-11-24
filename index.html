@@ -15,11 +15,13 @@
 
     async function configureClient() {
       console.log('Configuring Auth0 client...');
+      const redirectUri = window.location.origin;
+      alert(`Redirect URI: ${redirectUri}`); // Show redirect_uri in an alert for manual verification
       auth0 = await createAuth0Client({
         domain: 'dev-zukti-tech.uk.auth0.com',
         client_id: 'IfpGUsKwXt67G9qDiIUk79h73CnVGeNy',
         authorizationParams: {
-          redirect_uri: window.location.origin,
+          redirect_uri: redirectUri,
           scope: 'openid profile email' // Explicitly include the scope parameter
         }
       });
@@ -29,7 +31,11 @@
     async function login() {
       console.log('Login button clicked');
       try {
-        await auth0.loginWithRedirect();
+        await auth0.loginWithRedirect({
+          authorizationParams: {
+              prompt: 'login'
+        }
+        });
         console.log('Redirecting to Auth0 login page...');
       } catch (err) {
         console.error('Login error:', err);
